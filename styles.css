@@ -370,14 +370,9 @@ button:focus-visible {
    left: 50% + translateX(-50%) = center point of nav == center point of container.
    z-index: 1 ensures it sits above the flex row for pointer events. */
 .header__inner > .nav {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  /* Mobile: hidden by default via .nav { display:none } — do not override here */
+  /* Desktop positioning applied inside the 900px media query below */
   z-index: 1;
-  /* max-content: nav is exactly as wide as its links.
-     Without this, the nav flex-container grows to ~654px and the
-     ul sits left-aligned within it, making links look left of center. */
-  width: max-content;
 }
 
 /* Logo stays left via flex (first flex child, no grow) */
@@ -498,9 +493,25 @@ button:focus-visible {
 .nav.is-open .nav__mobile-cta:hover { background: var(--blue-400); }
 
 @media (min-width: 900px) {
-  .nav         { display: flex; }
   .nav-toggle  { display: none; }
   .header__cta { display: inline-flex; }
+
+  /* Nav: full-width absolute overlay, content centered.
+     left:0 right:0 = spans entire header__inner.
+     justify-content:center = ul locks to exact midpoint.
+     pointer-events:none = overlay won't block logo/CTA.
+     pointer-events:auto restored on links only. */
+  .header__inner > .nav {
+    display: flex;
+    position: absolute;
+    left: 0;
+    right: 0;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .header__inner > .nav .nav__list {
+    pointer-events: auto;
+  }
 }
 
 /* ══════════════════════════════════════════════
@@ -969,8 +980,12 @@ button:focus-visible {
      which conflicts with parent overflow:hidden clipping and causes bottom clipping. */
 }
 .slider__slide {
-  min-width: 100%;
-  flex-shrink: 0;
+  /* flex: 0 0 100% uses flex-basis resolution (against the track's block width = 840px).
+     min-width:100% was causing Chrome to resolve % against wrong ancestor (~1493px).
+     min-width:0 overrides browser's default min-width:auto for flex items. */
+  flex: 0 0 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .review-card {
