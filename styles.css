@@ -518,6 +518,9 @@ button:focus-visible {
     margin-left: 0;        /* clear old margin-left: auto from CTA rule */
   }
 
+  /* Mobile-only CTA link inside nav — hide on desktop */
+  .nav__mobile-cta { display: none; }
+
   .header__inner > .header__cta {
     grid-column: 3;
     justify-self: end;
