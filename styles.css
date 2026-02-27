@@ -366,13 +366,9 @@ button:focus-visible {
   gap: 16px;
 }
 
-/* Nav: absolutely centered to the container.
-   left: 50% + translateX(-50%) = center point of nav == center point of container.
-   z-index: 1 ensures it sits above the flex row for pointer events. */
 .header__inner > .nav {
-  /* Mobile: hidden by default via .nav { display:none } — do not override here */
-  /* Desktop positioning applied inside the 900px media query below */
-  z-index: 1;
+  /* Centered on desktop via CSS Grid (see 900px media query).
+     display:none on mobile from .nav rule; grid-column set at 900px+. */
 }
 
 /* Logo stays left via flex (first flex child, no grow) */
@@ -496,21 +492,36 @@ button:focus-visible {
   .nav-toggle  { display: none; }
   .header__cta { display: inline-flex; }
 
-  /* Nav: full-width absolute overlay, content centered.
-     left:0 right:0 = spans entire header__inner.
-     justify-content:center = ul locks to exact midpoint.
-     pointer-events:none = overlay won't block logo/CTA.
-     pointer-events:auto restored on links only. */
-  .header__inner > .nav {
-    display: flex;
-    position: absolute;
-    left: 0;
-    right: 0;
-    justify-content: center;
-    pointer-events: none;
+  /* CSS Grid: 3 columns (1fr | auto | 1fr).
+     Logo lands in col 1 (left), nav in col 2 (center), CTA in col 3 (right).
+     This perfectly centers the nav regardless of logo/CTA width asymmetry.
+     All absolute-positioning hacks removed — grid handles it geometrically. */
+  .header__inner {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-rows: auto;
+    align-items: center;
+    justify-content: normal; /* reset space-between from the flex default */
+    gap: 0;                  /* grid handles spacing via columns */
   }
-  .header__inner > .nav .nav__list {
-    pointer-events: auto;
+
+  .header__inner > .logo {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .header__inner > .nav {
+    grid-column: 2;
+    display: flex;
+    position: static;      /* clear the old absolute override */
+    transform: none;       /* clear old translateX */
+    margin-left: 0;        /* clear old margin-left: auto from CTA rule */
+  }
+
+  .header__inner > .header__cta {
+    grid-column: 3;
+    justify-self: end;
+    margin-left: 0;        /* grid handles spacing; auto margin not needed */
   }
 }
 
